@@ -7,7 +7,6 @@ from PIL import Image
 
 # -------------------- PAGE CONFIG --------------------
 st.set_page_config(page_title="🍔 Fast Food Classifier", layout="centered")
-
 st.title("🍕 Fast Food Image Classifier")
 st.write("Upload a food image and the model will predict its class!")
 
@@ -19,8 +18,10 @@ def load_model():
 
 model = load_model()
 
+# Show model input shape
+st.write("✅ Model input shape:", model.input_shape)
+
 # -------------------- CLASS LABELS --------------------
-# ⚠️ Replace these with your actual class names from the training directory
 class_names = [
     "Burger", "Pizza", "Hotdog", "Fries", "Sandwich",
     "Taco", "Nuggets", "Donut", "Pasta", "Salad"
@@ -35,11 +36,14 @@ if uploaded_file is not None:
     st.image(img, caption="Uploaded Image", use_container_width=True)
     st.write("")
 
-    # Preprocess image
-    img = img.resize((150, 150))
+    # Resize to match model input size
+    target_size = model.input_shape[1:3]  # e.g. (224, 224)
+    img = img.resize(target_size)
+
+    # Preprocess
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0  # same rescaling as training
+    img_array = img_array / 255.0
 
     # Predict
     predictions = model.predict(img_array)
